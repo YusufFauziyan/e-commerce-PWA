@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+    <!-- Load Google Sign-In Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <h1>Login with Google</h1>
+
+    <!-- Google Sign-In Button -->
+    <div id="g_id_onload"
+         data-client_id="998318510512-0pjb43tdqee95slmdl17sou83held6kd.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <!-- Display ID Token -->
+    <div>
+        <h2>Google ID Token:</h2>
+        <pre id="tokenOutput"></pre>
+        <h2>User:</h2>
+        <pre id="userOutput"></pre>
+    </div>
+
+    <script>
+        // Function to handle Google Sign-In response
+        function handleCredentialResponse(response) {
+            const googleIdToken = response.credential;
+            console.log("Google ID Token:", googleIdToken);
+
+            // Display the token in the UI (for testing purposes)
+            document.getElementById('tokenOutput').textContent = googleIdToken;
+
+            // Send the token to your backend API
+            fetch("http://localhost:3000/api/auth/google-login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token: googleIdToken })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response from backend:", data);
+                userOutput.textContent = JSON.stringify(data, null, 2);
+                alert("Login successful: " + data)
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Login failed. Check console for details.");
+            });
+        }
+    </script>
+</body>
+</html>
