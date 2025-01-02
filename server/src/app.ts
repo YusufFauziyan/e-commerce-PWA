@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import authRoutes from "./routes/authRoutes";
 import verifyRoutes from "./routes/verifyRoutes";
 import userRoutes from "./routes/userRoutes";
+import addressRoutes from "./routes/addressRoutes";
 
 const app: Express = express();
 
@@ -22,6 +23,7 @@ app.use(bodyParser.json());
 app.use("/api", authRoutes);
 app.use("/api", verifyRoutes);
 app.use("/api/collection", userRoutes);
+app.use("/api/collection", addressRoutes);
 
 const port = 3000;
 app.listen(port, () => {

@@ -1,21 +1,20 @@
 import { Router } from "express";
-import {
-  getAllUsers,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-} from "../controllers/userController";
 import { authenticateToken } from "../middleware/authMiddleware";
-import { authorizeAdmin } from "../middleware/roleMiddleware";
+import {
+  createAddress,
+  deleteAddress,
+  getAddress,
+  getAllAddress,
+  updateAddress,
+} from "../controllers/addressController";
 
 const router = Router();
 
 // Collection Users
-router.get("/address", authenticateToken, getAllUsers);
-router.get("/address/:id", authenticateToken, authorizeAdmin, getUser);
-router.post("/address", createUser);
-router.put("/address/:id", authenticateToken, authorizeAdmin, updateUser);
-router.delete("/address/:id", authenticateToken, authorizeAdmin, deleteUser);
+router.get("/address", authenticateToken, getAllAddress);
+router.get("/address/:id", authenticateToken, getAddress);
+router.post("/address", authenticateToken, createAddress);
+router.put("/address/:id", authenticateToken, updateAddress);
+router.delete("/address/:id", authenticateToken, deleteAddress);
 
 export default router;
