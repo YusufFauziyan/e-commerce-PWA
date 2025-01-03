@@ -1,14 +1,6 @@
 // controllers/userController.ts
 import { Request, Response } from "express";
 import {
-  getUsers,
-  getUserByIdModel,
-  postUser,
-  updateUserById,
-  deleteUserById,
-  checkUserExists,
-} from "../models/userModel"; // Pastikan model Anda benar
-import {
   createAddressModel,
   deleteAddressModel,
   getAddressModel,
@@ -23,6 +15,11 @@ export const getAllAddress = async (
 ): Promise<void> => {
   const loggedInUser = (req as any).user;
 
+  if (!loggedInUser) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   try {
     const address = await getAllAddressModel(
       loggedInUser.id,
@@ -31,7 +28,7 @@ export const getAllAddress = async (
 
     res.status(200).json(address);
   } catch (error) {
-    console.error("Error retrieving users:", error);
+    console.error("Error retrieving address:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
