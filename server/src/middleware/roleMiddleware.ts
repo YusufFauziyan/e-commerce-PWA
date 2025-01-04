@@ -15,3 +15,18 @@ export const authorizeAdmin = (
 
   next();
 };
+
+export const authorizeSeller = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const user = (req as any).user;
+
+  if (!user || user.role !== "seller") {
+    res.status(403).json({ message: "Access denied." });
+    return;
+  }
+
+  next();
+};

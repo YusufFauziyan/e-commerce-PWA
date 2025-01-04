@@ -8,6 +8,7 @@ import verifyRoutes from "./routes/verifyRoutes";
 import userRoutes from "./routes/userRoutes";
 import addressRoutes from "./routes/addressRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
+import productRoutes from "./routes/productRoutes";
 
 const app: Express = express();
 
@@ -26,6 +27,7 @@ app.use("/api", verifyRoutes);
 app.use("/api/collection", userRoutes);
 app.use("/api/collection", addressRoutes);
 app.use("/api/collection", categoryRoutes);
+app.use("/api/collection", productRoutes);
 
 const port = 3000;
 app.listen(port, () => {
