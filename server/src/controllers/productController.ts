@@ -1,13 +1,6 @@
 // controllers/userController.ts
 import { Request, Response } from "express";
 import {
-  createCategoryModel,
-  deleteCategoryModel,
-  getAllCategoryModel,
-  getCategoryModel,
-  updateCategoryModel,
-} from "../models/categoryModel";
-import {
   createProductModel,
   deleteProductModel,
   getAllProductModel,
@@ -85,13 +78,26 @@ export const createProduct = async (req: Request, res: Response) => {
 
 // Edit product
 export const updateProduct = async (req: Request, res: Response) => {
+  const loggedInUser = (req as any).user;
   const id = req.params.id; // Mengambil id dari parameter URL
   const body = req.body; // Mengambil data pengguna dari body request
 
+  if (!loggedInUser) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
   try {
-    const productExists = await getProductModel(id); // Fungsi untuk memeriksa apakah pengguna sudah ada di database
+    const productExists = await getProductModel(id);
     if (!productExists) {
       res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    const product = await getProductModel(id);
+
+    if (product?.user_id !== loggedInUser.id) {
+      res.status(403).json({ message: "Forbidden" });
       return;
     }
 
@@ -106,12 +112,25 @@ export const updateProduct = async (req: Request, res: Response) => {
 
 // Delete product
 export const deleteProduct = async (req: Request, res: Response) => {
+  const loggedInUser = (req as any).user;
   const id = req.params.id; // Mengambil id dari parameter URL
+
+  if (!loggedInUser) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
 
   try {
     const productExists = await getProductModel(id);
     if (!productExists) {
       res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    const product = await getProductModel(id);
+
+    if (product?.user_id !== loggedInUser.id) {
+      res.status(403).json({ message: "Forbidden" });
       return;
     }
 
