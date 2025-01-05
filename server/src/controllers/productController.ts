@@ -21,7 +21,7 @@ export const getAllProduct = async (
   }
 
   try {
-    const products = await getAllProductModel(loggedInUser.id);
+    const products = await getAllProductModel();
 
     res.status(200).json(products);
   } catch (error) {

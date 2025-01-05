@@ -1,13 +1,6 @@
 import { Router } from "express";
 import { authenticateToken } from "../middleware/authMiddleware";
-import { authorizeAdmin, authorizeSeller } from "../middleware/roleMiddleware";
-import {
-  getAllCategories,
-  getCategory,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-} from "../controllers/categoryController";
+import { authorizeSeller } from "../middleware/roleMiddleware";
 import {
   createProduct,
   deleteProduct,

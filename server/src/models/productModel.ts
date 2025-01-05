@@ -15,13 +15,11 @@ interface Product extends RowDataPacket {
 }
 
 // get all product
-export const getAllProductModel = async (
-  userId: string
-): Promise<Product[]> => {
+export const getAllProductModel = async (): Promise<Product[]> => {
   const query = `
-    SELECT p.*, GROUP_CONCAT(c.name) AS categories FROM Product p JOIN Product_Category pc USING(product_id) JOIN Category c USING(category_id) WHERE p.user_id = ? GROUP BY p.product_id;`;
+    SELECT p.*, GROUP_CONCAT(c.name) AS categories FROM Product p JOIN Product_Category pc USING(product_id) JOIN Category c USING(category_id) GROUP BY p.product_id;`;
 
-  const [rows] = await db.query<Product[]>(query, [userId]);
+  const [rows] = await db.query<Product[]>(query);
 
   const products = rows.map((product) => ({
     ...product,
