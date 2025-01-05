@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { hashPassword } from "../utils/passwordUtils";
 
 interface Category extends RowDataPacket {
-  category_id: string;
   name: string;
   description: string;
 }
@@ -15,7 +14,13 @@ export const getAllCategoryModel = async (): Promise<Category[]> => {
   const query = "SELECT * FROM Category";
 
   const [rows] = await db.query<Category[]>(query);
-  return rows as Category[];
+
+  const categories = rows.map(({ category_id, ...category }) => ({
+    ...category,
+    id: category_id,
+  }));
+
+  return categories as Category[];
 };
 
 // get category by id
@@ -25,7 +30,12 @@ export const getCategoryModel = async (
   const query = "SELECT * FROM Category WHERE category_id = ?";
 
   const [rows] = await db.query<Category[]>(query, [id]);
-  return rows.length ? rows[0] : null;
+
+  if (rows.length === 0) return null;
+
+  const { category_id, ...category } = rows[0];
+
+  return { ...category, id: category_id } as Category;
 };
 
 // post category
@@ -46,7 +56,9 @@ export const createCategoryModel = async (
     [categoryId]
   );
 
-  return rows[0];
+  const { category_id, ...newCategory } = rows[0];
+
+  return { ...newCategory, id: category_id } as Category;
 };
 
 // put category
@@ -80,7 +92,9 @@ export const updateCategoryModel = async (
     [id]
   );
 
-  return updatedRows[0];
+  const { category_id, ...updatedCategory } = updatedRows[0];
+
+  return { ...updatedCategory, id: category_id } as Category;
 };
 
 // delete category

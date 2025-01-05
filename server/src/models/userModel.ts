@@ -17,14 +17,23 @@ interface User extends RowDataPacket {
 export const getUsers = async (): Promise<User[]> => {
   const query = "SELECT * FROM User";
   const [rows] = await db.query<User[]>(query);
-  return rows as User[];
+  const users = rows.map(({ user_id, ...user }) => ({
+    ...user,
+    id: user_id,
+  }));
+
+  return users as User[];
 };
 
 // get user by id
 export const getUserByIdModel = async (id: string): Promise<User | null> => {
   const query = "SELECT * FROM User WHERE user_id = ?";
   const [rows] = await db.query<User[]>(query, [id]);
-  return rows.length ? rows[0] : null;
+
+  if (rows.length === 0) return null;
+
+  const { user_id, ...user } = rows[0];
+  return { ...user, id: user_id } as User;
 };
 
 // post user
@@ -65,7 +74,11 @@ export const updateUserById = async (
     id,
   ]);
 
-  return result.affectedRows ? user : null;
+  if (!result.affectedRows) return null;
+
+  const updatedUser = await getUserByIdModel(id);
+
+  return updatedUser;
 };
 
 // delete user
@@ -90,7 +103,11 @@ export const getUserByEmail = async (
 
   const query = "SELECT * FROM User WHERE email = ?";
   const [rows] = await db.query<User[]>(query, [email]);
-  return rows[0] || null;
+
+  if (rows.length === 0) return null;
+
+  const { user_id, ...user } = rows[0];
+  return { ...user, id: user_id } as User;
 };
 
 // Save refresh token for a user
@@ -128,10 +145,7 @@ export const updateVerifiedPhoneNumber = async (
   if (!result.affectedRows) return null;
 
   // Fetch the updated user
-  const [users] = await db.query<User[]>(
-    "SELECT * FROM User WHERE user_id = ?",
-    [userId]
-  );
+  const updatedUser = await getUserByIdModel(userId);
 
-  return users[0] || null;
+  return updatedUser;
 };

@@ -4,14 +4,20 @@ import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { v4 as uuidv4 } from "uuid";
 import { getProductModel } from "./productModel";
 import { getAddressModel } from "./addressModel";
+import { createOrderItemModel, getAllOrderItemModel } from "./orderItemsModel";
 
 interface Order extends RowDataPacket {
-  order_id: string;
   user_id: string;
   status: string;
   total_price: number;
   order_date: string;
   address_id: string;
+}
+
+interface OrderItem extends RowDataPacket {
+  order_id: string;
+  product_id: string;
+  quantity: number;
 }
 
 // get all order
@@ -29,10 +35,12 @@ export const getAllOrderModel = async (
   const [rows] = await db.query<Order[]>(query, [userId]);
 
   const orders = await Promise.all(
-    rows.map(async (order) => {
+    rows.map(async ({ order_id, ...order }) => {
       return {
         ...order,
+        id: order_id,
         address: await getAddressModel(order.address_id),
+        orders: await getAllOrderItemModel(order_id),
       };
     })
   );
@@ -48,16 +56,21 @@ export const getOrderModel = async (id: string): Promise<Order | null> => {
   if (rows.length === 0) return null;
 
   const address = await getAddressModel(rows[0].address_id);
+  const orderItem = await getAllOrderItemModel(id);
+
+  const { order_id, ...order } = rows[0];
 
   return {
-    ...rows[0],
+    ...order,
+    id: order_id,
     address,
+    orders: orderItem,
   };
 };
 
 // post order
 export const createOrderModel = async (order: Order): Promise<Order> => {
-  const { user_id, status, total_price, address_id } = order;
+  const { user_id, status, total_price, address_id, orders } = order;
 
   const orderId = uuidv4();
   // Convert to MySQL DATETIME format
@@ -75,6 +88,17 @@ export const createOrderModel = async (order: Order): Promise<Order> => {
     address_id,
   ]);
 
+  // Insert order items
+  let ordersResult = [] as OrderItem[];
+
+  await Promise.all(
+    orders.map(async (orderItem: OrderItem) => {
+      const result = await createOrderItemModel(orderId, orderItem);
+
+      ordersResult.push(result);
+    })
+  );
+
   // Fetch the newly created order from the database
   const [rows] = await db.query<Order[]>(
     "SELECT * FROM `Order` WHERE order_id = ?",
@@ -83,9 +107,13 @@ export const createOrderModel = async (order: Order): Promise<Order> => {
 
   const address = await getAddressModel(address_id);
 
+  const { order_id, ...orderResult } = rows[0];
+
   return {
-    ...rows[0],
+    ...orderResult,
+    id: order_id,
     address,
+    orders: ordersResult,
   };
 };
 
@@ -123,9 +151,11 @@ export const updateOrderModel = async (
   );
 
   const address = await getAddressModel(updatedRows[0].address_id);
+  const { order_id, ...orderResult } = updatedRows[0];
 
   return {
-    ...updatedRows[0],
+    ...orderResult,
+    id: order_id,
     address,
   };
 };

@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { getProductModel } from "./productModel";
 
 interface Cart extends RowDataPacket {
-  cart_id: string;
   product_id: string;
   quantity: number;
   total_price: number;
@@ -27,9 +26,10 @@ export const getAllCartModel = async (
   const [rows] = await db.query<Cart[]>(query, [userId]);
 
   const carts = await Promise.all(
-    rows.map(async (cart) => {
+    rows.map(async ({ cart_id, ...cart }) => {
       return {
         ...cart,
+        id: cart_id,
         product: await getProductModel(cart.product_id),
       };
     })
@@ -46,9 +46,11 @@ export const getCartModel = async (id: string): Promise<Cart | null> => {
   if (rows.length === 0) return null;
 
   const product = await getProductModel(rows[0].product_id);
+  const { cart_id, ...cart } = rows[0];
 
   return {
-    ...rows[0],
+    ...cart,
+    id: cart_id,
     product,
   };
 };
@@ -76,9 +78,11 @@ export const createCartModel = async (cart: Cart): Promise<Cart> => {
   );
 
   const product = await getProductModel(product_id);
+  const { cart_id, ...row } = rows[0];
 
   return {
-    ...rows[0],
+    ...row,
+    id: cart_id,
     product,
   };
 };
@@ -116,9 +120,11 @@ export const updateCartModel = async (
   );
 
   const product = await getProductModel(updatedRows[0].product_id);
+  const { cart_id, ...row } = updatedRows[0];
 
   return {
-    ...updatedRows[0],
+    ...row,
+    id: cart_id,
     product,
   };
 };

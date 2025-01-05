@@ -6,7 +6,6 @@ import { hashPassword } from "../utils/passwordUtils";
 import { getCategoryModel } from "./categoryModel";
 
 interface Product extends RowDataPacket {
-  product_id: string;
   name: string;
   description: string;
   price: number;
@@ -21,8 +20,9 @@ export const getAllProductModel = async (): Promise<Product[]> => {
 
   const [rows] = await db.query<Product[]>(query);
 
-  const products = rows.map((product) => ({
+  const products = rows.map(({ product_id, ...product }) => ({
     ...product,
+    id: product_id,
     categories: product.categories?.split(","),
   }));
 
@@ -36,8 +36,11 @@ export const getProductModel = async (id: string): Promise<Product | null> => {
 
   const [rows] = await db.query<Product[]>(query, [id]);
 
-  const products = rows.map((product) => ({
+  if (rows.length === 0) return null;
+
+  const products = rows.map(({ product_id, ...product }) => ({
     ...product,
+    id: product_id,
     categories: product.categories?.split(","),
   }));
 
@@ -172,5 +175,9 @@ export const findProductByIdModel = async (
 
   const [rows] = await db.query<Product[]>(query, [id]);
 
-  return rows.length ? rows[0] : null;
+  if (rows.length === 0) return null;
+
+  const { product_id, ...product } = rows[0];
+
+  return { ...product, id: product_id } as Product;
 };

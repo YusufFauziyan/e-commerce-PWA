@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { hashPassword } from "../utils/passwordUtils";
 
 interface Address extends RowDataPacket {
-  address_id: string;
   user_id: string;
   street_address: string;
   city: string;
@@ -24,14 +23,26 @@ export const getAllAddressModel = async (
     query = "SELECT * FROM Address WHERE user_id = ?";
   }
   const [rows] = await db.query<Address[]>(query, [userId]);
-  return rows as Address[];
+  const address = rows.map(({ address_id, ...row }) => {
+    return {
+      ...row,
+      id: address_id,
+    };
+  });
+
+  return address as Address[];
 };
 
 // get address by id
 export const getAddressModel = async (id: string): Promise<Address | null> => {
   const query = "SELECT * FROM Address WHERE address_id = ?";
   const [rows] = await db.query<Address[]>(query, [id]);
-  return rows.length ? rows[0] : null;
+
+  if (rows.length === 0) return null;
+
+  const { address_id, ...address } = rows[0];
+
+  return { ...address, id: address_id };
 };
 
 // post address
@@ -58,7 +69,9 @@ export const createAddressModel = async (
     [addressId]
   );
 
-  return rows[0];
+  const { address_id, ...row } = rows[0];
+
+  return { ...row, id: address_id };
 };
 
 // put address
@@ -93,7 +106,9 @@ export const updateAddressModel = async (
     [id]
   );
 
-  return updatedRows[0];
+  const { address_id, ...row } = updatedRows[0];
+
+  return { ...row, id: address_id };
 };
 
 // delete address

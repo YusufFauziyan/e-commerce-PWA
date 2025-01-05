@@ -38,17 +38,17 @@ export const loginUser = async (req: Request, res: Response) => {
 
     // generate token
     const accessToken = generateAccessToken({
-      id: user.user_id,
+      id: user.id,
       email: user.email,
       role: user.role,
     });
     const refreshToken = generateRefreshToken({
-      id: user.user_id,
+      id: user.id,
       email: user.email,
       role: user.role,
     });
 
-    await saveRefreshToken(user.user_id, refreshToken);
+    await saveRefreshToken(user.id, refreshToken);
 
     const {
       password: userPassword,
@@ -134,12 +134,12 @@ export const loginWithGoogle = async (req: Request, res: Response) => {
 
     // generate token
     const accessToken = generateAccessToken({
-      id: user.user_id,
+      id: user.id,
       email: user.email,
       role: user.role,
     });
     const refreshToken = generateRefreshToken({
-      id: user.user_id,
+      id: user.id,
       email: user.email,
       role: user.role,
     });

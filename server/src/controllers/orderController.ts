@@ -62,10 +62,23 @@ export const getOrder = async (req: Request, res: Response) => {
 // create Order
 export const createOrder = async (req: Request, res: Response) => {
   const loggedInUser = (req as any).user;
-  const { address_id } = req.body;
+  const { address_id, orders } = req.body;
 
   if (!address_id) {
     res.status(400).json({ message: "address_id is required" });
+    return;
+  }
+
+  if (!orders || orders.length === 0) {
+    res.status(400).json({ message: "orders is required" });
+    return;
+  }
+
+  if (orders.some((order: any) => !order.product_id || !order.quantity)) {
+    res
+      .status(400)
+      .json({ message: "orders must have product_id and quantity" });
+    return;
   }
 
   try {

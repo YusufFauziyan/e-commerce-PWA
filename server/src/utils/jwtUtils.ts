@@ -8,7 +8,7 @@ if (!ACCESS_SECRET_KEY || !REFRESH_SECRET_KEY) {
 
 // Function to generate token
 export const generateAccessToken = (payload: object): string => {
-  const token = jwt.sign(payload, ACCESS_SECRET_KEY, { expiresIn: "1h" }); // Token available for 15 minutes
+  const token = jwt.sign(payload, ACCESS_SECRET_KEY, { expiresIn: "1d" }); // Token available for 15 minutes
   return token;
 };
 

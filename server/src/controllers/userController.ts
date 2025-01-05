@@ -67,12 +67,14 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     // check if user exists
     const userExists = await checkUserExists(user.email); // Fungsi untuk memeriksa apakah pengguna sudah ada di database
+
     if (userExists) {
       res.status(400).json({ message: "Email already exists" });
       return;
     }
 
     const newUser = await postUser({ password, ...user }); // Fungsi untuk menambahkan data pengguna ke database
+    console.log("newUser", newUser);
     res.status(201).json({ id: newUser, ...user }); // Mengirimkan respons dengan status 201 dan data pengguna yang ditambahkan
   } catch (error) {
     console.error("Error retrieving user:", error);
