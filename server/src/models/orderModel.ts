@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getProductModel } from "./productModel";
 import { getAddressModel } from "./addressModel";
 import { createOrderItemModel, getAllOrderItemModel } from "./orderItemsModel";
+import { formatToTimestamp } from "../utils/formatTime";
 
 interface Order extends RowDataPacket {
   user_id: string;
@@ -74,7 +75,7 @@ export const createOrderModel = async (order: Order): Promise<Order> => {
 
   const orderId = uuidv4();
   // Convert to MySQL DATETIME format
-  const orderDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const orderDate = formatToTimestamp(new Date().toISOString());
 
   const query =
     "INSERT INTO `Order` (order_id, user_id, status, total_price, order_date, address_id) VALUES (?, ?, ?, ?, ?, ?)";

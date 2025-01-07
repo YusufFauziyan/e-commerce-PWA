@@ -15,10 +15,12 @@ export const getAllCategoryModel = async (): Promise<Category[]> => {
 
   const [rows] = await db.query<Category[]>(query);
 
-  const categories = rows.map(({ category_id, ...category }) => ({
-    ...category,
-    id: category_id,
-  }));
+  const categories = rows
+    .map(({ category_id, ...category }) => ({
+      ...category,
+      id: category_id,
+    }))
+    .filter((f: Category) => f.name && f.description);
 
   return categories as Category[];
 };
@@ -102,4 +104,18 @@ export const deleteCategoryModel = async (id: string): Promise<boolean> => {
   const query = "DELETE FROM Category WHERE category_id = ?";
   const [result] = await db.query<ResultSetHeader>(query, [id]);
   return result.affectedRows > 0;
+};
+
+// get category empy
+export const getCategoryEmptyModel = async (): Promise<string | null> => {
+  const query =
+    "SELECT category_id FROM Category WHERE (name = '' OR name IS NULL) AND (description = '' OR description IS NULL);";
+
+  const [rows] = await db.query<Category[]>(query);
+
+  if (rows.length === 0) return null;
+
+  const { category_id } = rows[0];
+
+  return category_id;
 };

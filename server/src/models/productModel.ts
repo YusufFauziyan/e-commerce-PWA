@@ -3,7 +3,7 @@ import db from "../config"; // Impor konfigurasi DB Anda
 import { RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import { v4 as uuidv4 } from "uuid";
 import { hashPassword } from "../utils/passwordUtils";
-import { getCategoryModel } from "./categoryModel";
+import { getCategoryEmptyModel, getCategoryModel } from "./categoryModel";
 
 interface Product extends RowDataPacket {
   name: string;
@@ -20,11 +20,15 @@ export const getAllProductModel = async (): Promise<Product[]> => {
 
   const [rows] = await db.query<Product[]>(query);
 
-  const products = rows.map(({ product_id, ...product }) => ({
-    ...product,
-    id: product_id,
-    categories: product.categories?.split(","),
-  }));
+  const products = rows.map(({ product_id, ...product }) => {
+    const categories = product.categories?.split(",").filter((f: string) => f);
+
+    return {
+      ...product,
+      id: product_id,
+      categories,
+    };
+  });
 
   return products as Product[];
 };
@@ -38,11 +42,14 @@ export const getProductModel = async (id: string): Promise<Product | null> => {
 
   if (rows.length === 0) return null;
 
-  const products = rows.map(({ product_id, ...product }) => ({
-    ...product,
-    id: product_id,
-    categories: product.categories?.split(","),
-  }));
+  const products = rows.map(({ product_id, ...product }) => {
+    const categories = product.categories?.split(",").filter((f: string) => f);
+    return {
+      ...product,
+      id: product_id,
+      categories,
+    };
+  });
 
   if (products.length > 0) {
     return products[0];
@@ -57,7 +64,7 @@ export const getProductModel = async (id: string): Promise<Product | null> => {
 export const createProductModel = async (
   product: Product
 ): Promise<Product> => {
-  const {
+  let {
     name,
     description,
     price,
@@ -65,6 +72,12 @@ export const createProductModel = async (
     user_id,
     categories = [],
   } = product;
+
+  const emptyCategoryId = await getCategoryEmptyModel();
+
+  if (categories.length === 0 && emptyCategoryId) {
+    categories.push(emptyCategoryId);
+  }
 
   const productId = uuidv4();
   const queryProduct =
@@ -80,26 +93,22 @@ export const createProductModel = async (
   ]);
 
   // Insert product-category relations into Product_Category table (bulk insert)
-  if (categories.length > 0) {
-    await Promise.all(
-      categories.map((categoryId: string) =>
-        insertProductCategoryModel(productId, categoryId)
-      )
-    );
-  }
+  await Promise.all(
+    categories.map((categoryId: string) =>
+      insertProductCategoryModel(productId, categoryId)
+    )
+  );
 
   let categoriesDetail = [];
   const productDetail = await getProductModel(productId);
 
-  if (categories.length > 0) {
-    categoriesDetail = await Promise.all(
-      categories.map((categoryId: string) => getCategoryModel(categoryId))
-    );
-  }
+  categoriesDetail = await Promise.all(
+    categories.map((categoryId: string) => getCategoryModel(categoryId))
+  );
 
   return {
     ...productDetail,
-    categories: categoriesDetail,
+    categories: categoriesDetail.filter((f) => f.name && f.description),
   } as Product;
 };
 
