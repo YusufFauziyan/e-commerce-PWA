@@ -7,7 +7,7 @@ import {
   updatePaymentModel,
 } from "../models/paymentModel";
 import { getUserByIdModel } from "../models/userModel";
-import coreApi from "../helpers/midtransHelper";
+import coreApi from "../config/midtransConfig";
 import { getOrderModel } from "../models/orderModel";
 
 // Fetch all Payment or the logged-in Payment's data based on their role

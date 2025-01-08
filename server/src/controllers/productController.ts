@@ -7,6 +7,7 @@ import {
   getProductModel,
   updateProductModel,
 } from "../models/productModel";
+import { deleteMultipleImages, uploadMultipleImages } from "./uploadController";
 
 // Fetch all Product or the logged-in Product's data based on their role
 export const getAllProduct = async (
@@ -49,7 +50,7 @@ export const getProduct = async (req: Request, res: Response) => {
 // create product
 export const createProduct = async (req: Request, res: Response) => {
   const loggedInUser = (req as any).user;
-  const { name, price, stock_quantity } = req.body;
+  const { name, price, stock_quantity, categories, files } = req.body;
 
   if (!loggedInUser) {
     res.status(401).json({ message: "Unauthorized" });
@@ -64,10 +65,27 @@ export const createProduct = async (req: Request, res: Response) => {
   const body = {
     ...req.body,
     user_id: loggedInUser.id,
+    userEmail: loggedInUser.email,
+    categories:
+      categories && typeof categories === "string"
+        ? JSON.parse(categories)
+        : categories || [],
   };
 
   try {
-    const product = await createProductModel(body);
+    let files = req.files as Express.Multer.File[];
+
+    if (!files || !files.length) {
+      res.status(400).json({ message: "Image must be upload, minimum 1" });
+      return;
+    }
+
+    const uploadResults = await uploadMultipleImages(files, loggedInUser.email);
+
+    const product = await createProductModel({
+      ...body,
+      images: uploadResults,
+    });
 
     res.status(201).json(product);
   } catch (error) {
@@ -80,7 +98,7 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   const loggedInUser = (req as any).user;
   const id = req.params.id; // Mengambil id dari parameter URL
-  const body = req.body; // Mengambil data pengguna dari body request
+  const { categories } = req.body; // Mengambil data pengguna dari body request
 
   if (!loggedInUser) {
     res.status(401).json({ message: "Unauthorized" });
@@ -94,16 +112,38 @@ export const updateProduct = async (req: Request, res: Response) => {
       return;
     }
 
-    const product = await getProductModel(id);
-
-    if (product?.user_id !== loggedInUser.id) {
+    if (productExists?.user_id !== loggedInUser.id) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }
 
-    const updateProduct = await updateProductModel(id, body);
+    let files = req.files as Express.Multer.File[];
 
-    res.status(200).json(updateProduct); // Mengirimkan respons dengan status 200 dan data pengguna yang diupdate
+    if (!files || !files.length) {
+      res.status(400).json({ message: "Image must be upload, minimum 1" });
+      return;
+    }
+
+    const public_ids = productExists.images.map(
+      (image: any) => image.public_id
+    );
+
+    // delete old images
+    await deleteMultipleImages(public_ids);
+
+    // upload new images
+    const uploadResults = await uploadMultipleImages(files, loggedInUser.email);
+
+    const updateProduct = await updateProductModel(id, {
+      ...req.body,
+      images: uploadResults,
+      categories:
+        categories && typeof categories === "string"
+          ? JSON.parse(categories)
+          : categories || productExists.categories,
+    });
+
+    res.status(200).json(updateProduct);
   } catch (error) {
     console.error("Error updating category:", error);
     res.status(500).json({ message: "Internal Server Error" });

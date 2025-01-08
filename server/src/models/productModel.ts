@@ -11,6 +11,7 @@ interface Product extends RowDataPacket {
   price: number;
   stock_quantity: string;
   user_id: string;
+  images: string[];
 }
 
 // get all product
@@ -70,6 +71,7 @@ export const createProductModel = async (
     price,
     stock_quantity,
     user_id,
+    images = [],
     categories = [],
   } = product;
 
@@ -81,7 +83,7 @@ export const createProductModel = async (
 
   const productId = uuidv4();
   const queryProduct =
-    "INSERT INTO Product (product_id, name, description, price, stock_quantity, user_id) VALUES (?, ?, ?, ?, ?, ?)";
+    "INSERT INTO Product (product_id, name, description, price, stock_quantity, user_id, images) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
   await db.query<ResultSetHeader>(queryProduct, [
     productId,
@@ -90,6 +92,7 @@ export const createProductModel = async (
     price,
     stock_quantity,
     user_id,
+    JSON.stringify(images),
   ]);
 
   // Insert product-category relations into Product_Category table (bulk insert)
@@ -108,7 +111,9 @@ export const createProductModel = async (
 
   return {
     ...productDetail,
-    categories: categoriesDetail.filter((f) => f.name && f.description),
+    categories: categoriesDetail
+      .filter((f) => f.name && f.description)
+      .map((m) => m.name),
   } as Product;
 };
 
@@ -126,13 +131,14 @@ export const updateProductModel = async (
 
   // // Update the product
   const queryProduct =
-    "UPDATE Product SET name = ?, description = ?, price = ?, stock_quantity = ? WHERE product_id = ?";
+    "UPDATE Product SET name = ?, description = ?, price = ?, stock_quantity = ?, images = ? WHERE product_id = ?";
 
   await db.query<ResultSetHeader>(queryProduct, [
     product.name ?? existingProduct.name,
     product.description ?? existingProduct.description,
     product.price ?? existingProduct.price,
     product.stock_quantity ?? existingProduct.stock_quantity,
+    product.images ? JSON.stringify(product.images) : existingProduct.images,
     id,
   ]);
 
@@ -141,6 +147,12 @@ export const updateProductModel = async (
     await db.query(queryProductCategory, [id]);
 
     const categories = (product.categories || []).filter((f: string) => f);
+
+    const emptyCategoryId = await getCategoryEmptyModel();
+
+    if (categories.length === 0 && emptyCategoryId) {
+      categories.push(emptyCategoryId);
+    }
 
     for (const categoryId of categories) {
       await insertProductCategoryModel(id, categoryId);
