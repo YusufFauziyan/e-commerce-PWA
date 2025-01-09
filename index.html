@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+    <!-- Load Google Sign-In Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- midtrans payment -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-JqddhaogEh1SIGf4"></script>
+</head>
+<body>
+    <h1>Login with Google</h1>
+
+    <!-- Google Sign-In Button -->
+    <div id="g_id_onload"
+         data-client_id="998318510512-0pjb43tdqee95slmdl17sou83held6kd.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <!-- Display ID Token -->
+    <div>
+        <h2>Google ID Token:</h2>
+        <pre id="tokenOutput"></pre>
+        <h2>User:</h2>
+        <pre id="userOutput"></pre>
+    </div>
+
+    <!-- midtrans -->
+    <h1>Midtrans Payment Integration</h1>
+
+    <!-- Form for Transaction -->
+    <form id="paymentForm">
+        <div>
+            <label for="orderId">Order ID:</label>
+            <input type="text" id="orderId" name="orderId" placeholder="ORDER-12345" required>
+        </div>
+        <button type="button" onclick="makePayment()">Pay Now</button>
+    </form>
+
+    <script>
+        let token = null;
+        // Function to handle Google Sign-In response
+        function handleCredentialResponse(response) {
+            const googleIdToken = response.credential;
+            console.log("Google ID Token:", googleIdToken);
+
+            // Display the token in the UI (for testing purposes)
+            document.getElementById('tokenOutput').textContent = googleIdToken;
+
+            // Send the token to your backend API
+            fetch("http://localhost:3000/api/auth/google-login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ token: googleIdToken })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response from backend:", data);
+                token = data.accessToken;
+                userOutput.textContent = JSON.stringify(data, null, 2);
+                alert("Login successful: " + data)
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Login failed. Check console for details.");
+            });
+        }
+
+
+        // Function to initiate payment
+        function makePayment() {
+            // Get form data
+            const orderId = document.getElementById("orderId").value;
+
+            // Send transaction details to backend
+            fetch("http://localhost:3000/api/payment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Transaction Data:", data);
+
+                // Check if transaction token is returned
+                if (data.transactionToken) {
+                    // Call Snap.js to open the payment popup
+                    window.snap.pay(data.transactionToken, {
+                        onSuccess: function(result) {
+                            console.log("Payment success:", result);
+                            alert("Payment successful!");
+                        },
+                        onPending: function(result) {
+                            console.log("Payment pending:", result);
+                            alert("Payment pending.");
+                        },
+                        onError: function(result) {
+                            console.error("Payment failed:", result);
+                            alert("Payment failed!");
+                        },
+                        onClose: function() {
+                            console.log("Payment popup closed.");
+                        }
+                    });
+                } else {
+                    alert("Failed to create transaction. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error creating transaction:", error);
+                alert("Failed to create transaction. Check console for details.");
+            });
+        }
+    </script>
+</body>
+</html>
