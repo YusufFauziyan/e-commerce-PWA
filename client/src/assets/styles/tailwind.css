@@ -1,3 +1,63 @@
+/* Import font-family.css harus di bagian paling awal */
+@import '../fonts/font-family.css';
+
+/* Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Variabel CSS */
+:root {
+    --color-text: #2c3e50;
+    --color-heading: #2c3e50;
+    --color-border: rgba(60, 60, 60, 0.12);
+    --color-border-hover: rgba(60, 60, 60, 0.29);
+    
+    --color-background: #ffffff;
+    --color-background-primary: #F0F0F0;
+    --color-background-common-black: #000000;
+    ---color-background-common-white: #ffffff;
+
+
+    --color-text-common-black: #000000;
+    --color-text-common-white: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: rgba(235, 235, 235, 0.64);
+    --color-heading: #ffffff;
+    --color-border: rgba(84, 84, 84, 0.48);
+    --color-border-hover: rgba(84, 84, 84, 0.65);
+
+    --color-background: #181818;
+    --color-background-primary: #F0F0F0;
+    --color-background-common-black: #ffffff;
+    ---color-background-common-white: #000000;
+
+    --color-text-common-black: #ffffff;
+    --color-text-common-white: #000000;
+  }
+}
+
+/* Global styles untuk body */
+@layer base {
+  body {
+    @apply min-h-screen text-[15px] leading-relaxed transition-all duration-500;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Aturan Default untuk Elemen */
+p, a {
+  @apply font-sans text-text;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading text-heading;
+}
