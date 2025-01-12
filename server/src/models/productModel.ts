@@ -9,6 +9,7 @@ interface Product extends RowDataPacket {
   name: string;
   description: string;
   price: number;
+  discount: number;
   stock_quantity: string;
   sold_quantity: string;
   user_id: string;
@@ -16,7 +17,23 @@ interface Product extends RowDataPacket {
 }
 
 // get all product
-export const getAllProductModel = async (): Promise<Product[]> => {
+export const getAllProductModel = async (
+  orderBy: string,
+  sortOrder: string,
+  offset: number,
+  limit: number
+): Promise<{ products: Product[]; total: number }> => {
+  // Query to get the total count of products
+  const [totalRows] = await db.query("SELECT COUNT(*) AS total FROM Product");
+  const total = (totalRows as RowDataPacket[])[0].total;
+
+  // Validasi input untuk orderBy dan sortOrder
+  const validOrderBy = ["created_at", "price", "name"].includes(orderBy)
+    ? orderBy
+    : "created_at"; // Default ke created_at jika tidak valid
+  const validSortOrder = sortOrder.toLowerCase() === "desc" ? "DESC" : "ASC";
+
+  // Susun query
   const query = `
     SELECT 
       p.*, 
@@ -24,15 +41,20 @@ export const getAllProductModel = async (): Promise<Product[]> => {
       (p.price - discount) AS final_price
     FROM 
       Product p 
-    JOIN 
+    LEFT JOIN 
       Product_Category pc USING(product_id) 
-    JOIN 
+    LEFT JOIN 
       Category c USING(category_id) 
     GROUP BY 
-      p.product_id;`;
+      p.product_id
+    ORDER BY 
+      ${validOrderBy} ${validSortOrder}
+    LIMIT ? OFFSET ?;
+  `;
 
-  const [rows] = await db.query<Product[]>(query);
+  const [rows] = await db.query<Product[]>(query, [limit, offset]);
 
+  // Transformasi data
   const products = rows.map(({ product_id, ...product }) => {
     const categories = product.categories?.split(",").filter((f: string) => f);
 
@@ -43,7 +65,7 @@ export const getAllProductModel = async (): Promise<Product[]> => {
     };
   });
 
-  return products as Product[];
+  return { products, total };
 };
 
 // get product by id
@@ -95,6 +117,7 @@ export const createProductModel = async (
     name,
     description,
     price,
+    discount,
     stock_quantity,
     user_id,
     images = [],
@@ -110,9 +133,9 @@ export const createProductModel = async (
   const productId = uuidv4();
   const queryProduct = `
     INSERT INTO 
-      Product (product_id, name, description, price, stock_quantity, user_id, images) 
+      Product (product_id, name, description, price, discount, stock_quantity, user_id, images) 
     VALUES 
-      (?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
   await db.query<ResultSetHeader>(queryProduct, [
@@ -120,6 +143,7 @@ export const createProductModel = async (
     name,
     description,
     price,
+    discount,
     stock_quantity,
     user_id,
     JSON.stringify(images),
@@ -161,12 +185,13 @@ export const updateProductModel = async (
 
   // // Update the product
   const queryProduct =
-    "UPDATE Product SET name = ?, description = ?, price = ?, stock_quantity = ?, sold_quantity = ?, images = ? WHERE product_id = ?";
+    "UPDATE Product SET name = ?, description = ?, price = ?, discount = ?, stock_quantity = ?, sold_quantity = ?, images = ? WHERE product_id = ?";
 
   await db.query<ResultSetHeader>(queryProduct, [
     product.name ?? existingProduct.name,
     product.description ?? existingProduct.description,
     product.price ?? existingProduct.price,
+    product.discount ?? existingProduct.discount,
     product.stock_quantity ?? existingProduct.stock_quantity,
     product.sold_quantity ?? existingProduct.sold_quantity,
     product.images

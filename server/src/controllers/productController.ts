@@ -14,10 +14,32 @@ export const getAllProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const products = await getAllProductModel();
+  const {
+    page = 1,
+    limit = 10,
+    sort = "desc",
+    orderBy = "created_at",
+  } = req.query;
 
-    res.status(200).json(products);
+  const currentPage = Number(page);
+  const perPage = Number(limit);
+  const offset = (currentPage - 1) * perPage;
+
+  try {
+    const { products, total } = await getAllProductModel(
+      orderBy as string,
+      sort as string,
+      offset,
+      perPage
+    );
+
+    res.status(200).json({
+      page: currentPage,
+      perPage,
+      total,
+      totalPages: Math.ceil(total / perPage),
+      products,
+    });
   } catch (error) {
     console.error("Error retrieving category:", error);
     res.status(500).json({ message: "Internal Server Error" });
