@@ -9,8 +9,8 @@ import { formatToTimestamp } from "../utils/formatTime";
 interface Payment extends RowDataPacket {
   id: string;
   order_id: string;
-  transaction_id: string;
-  payment_type: string;
+  transaction_id: number;
+  payment_type: number;
   gross_amount: number;
   transaction_time: string;
   settlement_time: string;

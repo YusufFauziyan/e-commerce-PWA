@@ -13,6 +13,7 @@ import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import shippingRoutes from "./routes/shippingRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
+import reviewRoutes from "./routes/reviewRoutes";
 
 const app: Express = express();
 
@@ -35,6 +36,7 @@ app.use("/api/collection", productRoutes);
 app.use("/api/collection", cartRoutes);
 app.use("/api/collection", orderRoutes);
 app.use("/api/collection", shippingRoutes);
+app.use("/api/collection", reviewRoutes);
 app.use("/api", paymentRoutes);
 
 const port = 3000;

@@ -9,6 +9,7 @@ import {
 import { getUserByIdModel } from "../models/userModel";
 import coreApi from "../config/midtransConfig";
 import { getOrderModel } from "../models/orderModel";
+import { getProductModel, updateProductModel } from "../models/productModel";
 
 // Fetch all Payment or the logged-in Payment's data based on their role
 export const getAllPayment = async (
@@ -129,8 +130,6 @@ export const createPayment = async (req: Request, res: Response) => {
 
 // payment noitifaction
 export const paymentNotification = async (req: Request, res: Response) => {
-  console.log({ body: req.body });
-
   const { order_id, status_code } = req.body;
 
   try {
@@ -141,13 +140,33 @@ export const paymentNotification = async (req: Request, res: Response) => {
       return;
     }
 
+    const productsOrdered = exitingPayment.order.orders;
+
     if (status_code === "201" || status_code === "200") {
       // payment midtrans created (201) or success (200)
-      const paymentAdded = await updatePaymentModel(order_id, req.body);
 
-      res
-        .status(200)
-        .json({ message: "Payment notification received", data: paymentAdded });
+      await updatePaymentModel(order_id, req.body);
+
+      if (status_code === "200") {
+        // decrese stock and increase sold
+        for (const { product, quantity } of productsOrdered) {
+          const productId = product.id;
+          const stock = Number(product.stock_quantity);
+          const sold = Number(product.sold_quantity);
+
+          const totalStock = stock - quantity;
+          const totalSold = sold + quantity;
+
+          await updateProductModel(productId, {
+            stock_quantity: totalStock,
+            sold_quantity: totalSold,
+          });
+        }
+
+        console.log("Stock and sold quantity updated");
+      }
+
+      res.status(200).json({ message: "Payment notification received" });
 
       return;
     }

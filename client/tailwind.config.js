@@ -18,7 +18,7 @@ module.exports = {
       },
       spacing: {
         'p-container-x': '3rem', // px: 12
-        'p-container-y': '1rem', // py: 4
+        'p-container-y': '1.5rem', // py: 4
       },
     },
   },
@@ -26,7 +26,7 @@ module.exports = {
     function ({ addUtilities }) {
       addUtilities({
         '.p-container': {
-          padding: '1rem 3rem', // py: 4, px: 12
+          padding: '1.5rem 3rem', // py: 4, px: 12
         },
         '.p-container-x': {
           paddingLeft: '3rem', // px: 12
@@ -46,6 +46,24 @@ module.exports = {
         },
         '.text-common-white': {
           color: 'var(--color-text-common-white)',
+        },
+        '.text-shadow-sm': {
+          'text-shadow': '1px 2px rgb(0 0 0 / 0.1)', // Example
+        },
+        '.text-shadow': {
+          'text-shadow': '2px 4px rgb(0 0 0 / 0.1)', // Example shadow
+        },
+        '.text-shadow-md': {
+          'text-shadow': '4px 6px rgb(0 0 0 / 0.1), 0 2px 4px rgb(0 0 0 / 0.06)',
+        },
+        '.text-shadow-lg': {
+          'text-shadow': '10px 15px rgb(0 0 0 / 0.1), 0 4px 6px rgb(0 0 0 / 0.05)',
+        },
+        '.text-shadow-xl': {
+          'text-shadow': '20px 25px rgb(0 0 0 / 0.1), 0 10px 10px rgb(0 0 0 / 0.04)',
+        },
+        '.text-shadow-2xl': {
+          'text-shadow': '25px 50px rgb(0 0 0 / 0.25)',
         },
       });
     },

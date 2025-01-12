@@ -34,11 +34,11 @@ import { BuildingStorefrontIcon } from '@heroicons/vue/24/solid'
           <a href="#" class="font-medium text-xs whitespace-nowrap">Brands</a>
         </div>
         <div class="bg-primary w-full rounded-full flex items-center py-2 shadow px-4 gap-2">
-          <MagnifyingGlassIcon class="h-4 w-4 text-common-black" />
+          <MagnifyingGlassIcon class="h-4 w-4 text-black/60" />
 
           <input
             type="text"
-            class="bg-transparent text-xs w-full focus:outline-none"
+            class="bg-transparent text-xs w-full focus:outline-none text-black/60"
             placeholder="Search for products..."
           />
         </div>

@@ -14,13 +14,6 @@ export const getAllProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const loggedInUser = (req as any).user;
-
-  if (!loggedInUser) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
-  }
-
   try {
     const products = await getAllProductModel();
 

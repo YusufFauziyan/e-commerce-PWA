@@ -64,14 +64,9 @@ export const createAddressModel = async (
   ]);
 
   // Fetch the newly created address from the database
-  const [rows] = await db.query<Address[]>(
-    "SELECT * FROM Address WHERE address_id = ?",
-    [addressId]
-  );
+  const addressDetail = await getAddressModel(addressId);
 
-  const { address_id, ...row } = rows[0];
-
-  return { ...row, id: address_id };
+  return addressDetail as Address;
 };
 
 // put address
@@ -101,14 +96,9 @@ export const updateAddressModel = async (
   ]);
 
   // Fetch and return the updated address
-  const [updatedRows] = await db.query<Address[]>(
-    "SELECT * FROM Address WHERE address_id = ?",
-    [id]
-  );
+  const addressDetail = await getAddressModel(id);
 
-  const { address_id, ...row } = updatedRows[0];
-
-  return { ...row, id: address_id };
+  return addressDetail as Address;
 };
 
 // delete address

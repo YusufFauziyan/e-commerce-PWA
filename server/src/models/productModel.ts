@@ -10,6 +10,7 @@ interface Product extends RowDataPacket {
   description: string;
   price: number;
   stock_quantity: string;
+  sold_quantity: string;
   user_id: string;
   images: string[];
 }
@@ -17,7 +18,18 @@ interface Product extends RowDataPacket {
 // get all product
 export const getAllProductModel = async (): Promise<Product[]> => {
   const query = `
-    SELECT p.*, GROUP_CONCAT(c.name) AS categories FROM Product p JOIN Product_Category pc USING(product_id) JOIN Category c USING(category_id) GROUP BY p.product_id;`;
+    SELECT 
+      p.*, 
+      GROUP_CONCAT(c.name) AS categories,
+      (p.price - discount) AS final_price
+    FROM 
+      Product p 
+    JOIN 
+      Product_Category pc USING(product_id) 
+    JOIN 
+      Category c USING(category_id) 
+    GROUP BY 
+      p.product_id;`;
 
   const [rows] = await db.query<Product[]>(query);
 
@@ -37,7 +49,21 @@ export const getAllProductModel = async (): Promise<Product[]> => {
 // get product by id
 export const getProductModel = async (id: string): Promise<Product | null> => {
   const query = `
-    SELECT p.*, GROUP_CONCAT(c.name) AS categories FROM Product p JOIN Product_Category pc USING(product_id) JOIN Category c USING(category_id) WHERE p.product_id = ? GROUP BY p.product_id;`;
+    SELECT 
+      p.*, 
+      GROUP_CONCAT(c.name) AS categories,
+      (p.price - discount) AS final_price
+    FROM 
+      Product p 
+    JOIN 
+      Product_Category pc USING(product_id) 
+    JOIN 
+      Category c USING(category_id) 
+    WHERE 
+      p.product_id = ? 
+    GROUP BY 
+      p.product_id;
+`;
 
   const [rows] = await db.query<Product[]>(query, [id]);
 
@@ -82,8 +108,12 @@ export const createProductModel = async (
   }
 
   const productId = uuidv4();
-  const queryProduct =
-    "INSERT INTO Product (product_id, name, description, price, stock_quantity, user_id, images) VALUES (?, ?, ?, ?, ?, ?, ?)";
+  const queryProduct = `
+    INSERT INTO 
+      Product (product_id, name, description, price, stock_quantity, user_id, images) 
+    VALUES 
+      (?, ?, ?, ?, ?, ?, ?)
+    `;
 
   await db.query<ResultSetHeader>(queryProduct, [
     productId,
@@ -120,7 +150,7 @@ export const createProductModel = async (
 // put product
 export const updateProductModel = async (
   id: string,
-  product: Product
+  product: Product | any
 ): Promise<Product | null> => {
   // Fetch the existing product
   const productDetail = await getProductModel(id);
@@ -131,14 +161,17 @@ export const updateProductModel = async (
 
   // // Update the product
   const queryProduct =
-    "UPDATE Product SET name = ?, description = ?, price = ?, stock_quantity = ?, images = ? WHERE product_id = ?";
+    "UPDATE Product SET name = ?, description = ?, price = ?, stock_quantity = ?, sold_quantity = ?, images = ? WHERE product_id = ?";
 
   await db.query<ResultSetHeader>(queryProduct, [
     product.name ?? existingProduct.name,
     product.description ?? existingProduct.description,
     product.price ?? existingProduct.price,
     product.stock_quantity ?? existingProduct.stock_quantity,
-    product.images ? JSON.stringify(product.images) : existingProduct.images,
+    product.sold_quantity ?? existingProduct.sold_quantity,
+    product.images
+      ? JSON.stringify(product.images)
+      : JSON.stringify(existingProduct.images),
     id,
   ]);
 

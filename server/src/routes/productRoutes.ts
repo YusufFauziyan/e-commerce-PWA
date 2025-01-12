@@ -16,8 +16,8 @@ import {
 const router = Router();
 
 // Collection Categories
-router.get("/product", authenticateToken, getAllProduct);
-router.get("/product/:id", authenticateToken, getProduct);
+router.get("/product", getAllProduct);
+router.get("/product/:id", getProduct);
 router.post(
   "/product",
   authenticateToken,
