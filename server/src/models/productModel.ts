@@ -28,7 +28,12 @@ export const getAllProductModel = async (
   const total = (totalRows as RowDataPacket[])[0].total;
 
   // Validasi input untuk orderBy dan sortOrder
-  const validOrderBy = ["created_at", "price", "name"].includes(orderBy)
+  const validOrderBy = [
+    "created_at",
+    "price",
+    "name",
+    "sold_quantity",
+  ].includes(orderBy)
     ? orderBy
     : "created_at"; // Default ke created_at jika tidak valid
   const validSortOrder = sortOrder.toLowerCase() === "desc" ? "DESC" : "ASC";
