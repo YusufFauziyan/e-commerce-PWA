@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue'
 import Banner from '../banner.vue'
 import NewProduct from '../NewProduct.vue'
 import TopSelling from '../TopSelling.vue'
+import DressStyle from '../DressStyle.vue'
 import { getAllProducts } from '@/services/productService'
 import { handleApiError } from '@/utils/api/apiErrorHandler'
 
@@ -49,6 +50,7 @@ onMounted(() => {
       <NewProduct :products="newProducts" />
       <div class="border-b w-full" />
       <TopSelling :products="soldProducts" />
+      <DressStyle />
     </div>
   </main>
 </template>

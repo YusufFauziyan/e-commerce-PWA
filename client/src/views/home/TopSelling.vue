@@ -21,7 +21,7 @@ defineProps<{
 
 <template>
   <div class="flex flex-col justify-center items-center my-12">
-    <h1 class="font-extrabold text-2xl">TOP SELLINGS</h1>
+    <h1 class="font-extrabold text-4xl text-common-black">TOP SELLINGS</h1>
 
     <div class="grid grid-cols-4 gap-4 mt-12 w-full">
       <div
