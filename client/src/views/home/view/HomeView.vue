@@ -5,6 +5,7 @@ import Banner from '../banner.vue'
 import NewProduct from '../NewProduct.vue'
 import TopSelling from '../TopSelling.vue'
 import DressStyle from '../DressStyle.vue'
+import HappyCustomer from '../HappyCustomer.vue'
 import { getAllProducts } from '@/services/productService'
 import { handleApiError } from '@/utils/api/apiErrorHandler'
 
@@ -43,7 +44,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="">
+  <main>
     <Banner />
 
     <div class="p-container">
@@ -51,6 +52,7 @@ onMounted(() => {
       <div class="border-b w-full" />
       <TopSelling :products="soldProducts" />
       <DressStyle />
+      <HappyCustomer />
     </div>
   </main>
 </template>
