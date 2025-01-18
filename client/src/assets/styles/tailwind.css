@@ -17,11 +17,11 @@
     --color-background: #ffffff;
     --color-background-primary: #F0F0F0;
     --color-background-common-black: #000000;
-    ---color-background-common-white: #ffffff;
+    ---color-background-common-white: #ffffff !important;
 
 
     --color-text-common-black: #000000;
-    --color-text-common-white: #ffffff;
+    --color-text-common-white: #ffffff !important;
 }
 
 @media (prefers-color-scheme: dark) {

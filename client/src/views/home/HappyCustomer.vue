@@ -10,23 +10,23 @@ interface Testimonial {
   verified: boolean
 }
 
-const testimonials: Testimonial[] = [...new Array(12)].map((_, index) => ({
+const testimonials: Testimonial[] = [...new Array(16)].map((_, index) => ({
   id: index,
   name: faker.person.firstName(),
   content: faker.lorem.paragraph(),
   verified: true,
 }))
 
-const currentIndex = ref(2)
+const currentIndex = ref(5)
 const slideInterval = ref<number | null>(null)
-const totalPages = 10
+const totalPages = 10 // 3 card in view, adjust pages accordingly
 
 const next = () => {
-  currentIndex.value = (currentIndex.value + 1) % totalPages
+  currentIndex.value = (currentIndex.value + 1) % (totalPages + 1)
 }
 
 const prev = () => {
-  currentIndex.value = currentIndex.value === 0 ? totalPages - 1 : currentIndex.value - 1
+  currentIndex.value = currentIndex.value === 0 ? totalPages : currentIndex.value - 1
 }
 
 const startAutoSlide = () => {
@@ -65,12 +65,16 @@ onMounted(() => {
     <div class="overflow-hidden">
       <div
         class="flex transition-transform duration-500 ease-in-out gap-4"
-        :style="{ transform: `translateX(-${currentIndex * 30}%)` }"
+        :style="{ transform: `translateX(-${currentIndex * 25}%)` }"
       >
         <div
           v-for="(testimonial, index) in testimonials"
           :key="testimonial.id"
-          class="w-[30%] flex-shrink-0 shadow-md border rounded-xl overflow-hidden box-border bg-common-white p-8 rounded-lg shadow-lg"
+          class="w-[25%] flex-shrink-0 box-border bg-white p-8 rounded-lg shadow-lg border"
+          :class="{
+            'opacity-100': index >= currentIndex && index < currentIndex + 3,
+            'opacity-50 blur-sm': index < currentIndex || index >= currentIndex + 3,
+          }"
         >
           <div class=" ">
             <div class="flex items-center mb-4">
@@ -89,7 +93,7 @@ onMounted(() => {
               </div>
             </div>
             <div class="flex items-center mb-1">
-              <span class="font-semibold">{{ testimonial.name }}</span>
+              <span class="font-semibold dark:text-black">{{ testimonial.name }}</span>
               <span v-if="testimonial.verified" class="ml-2 text-green-500">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -100,10 +104,16 @@ onMounted(() => {
                 </svg>
               </span>
             </div>
-            <p class="opacity-60 mb-4 line-clamp-3">{{ testimonial.content }}</p>
+            <p class="opacity-60 mb-4 line-clamp-3 dark:text-black">{{ testimonial.content }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.flex-shrink-0 {
+  flex: 0 0 auto;
+}
+</style>

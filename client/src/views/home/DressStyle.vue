@@ -21,7 +21,7 @@ defineProps<{
 
 <template>
   <div class="bg-primary px-12 py-20 rounded-lg">
-    <h1 class="font-extrabold text-center text-4xl text-common-black tracking-tight text-shadowk">
+    <h1 class="font-extrabold text-center text-4xl dark:text-black tracking-tight text-shadowk">
       BROWSE BY DRESS STYLE
     </h1>
 
