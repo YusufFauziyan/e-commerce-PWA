@@ -20,7 +20,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-primary px-12 py-20 rounded-lg">
+  <div class="bg-primary px-12 py-20 rounded-lg container">
     <h1 class="font-extrabold text-center text-4xl dark:text-black tracking-tight text-shadowk">
       BROWSE BY DRESS STYLE
     </h1>

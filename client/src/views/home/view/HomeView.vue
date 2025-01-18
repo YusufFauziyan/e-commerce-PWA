@@ -47,12 +47,10 @@ onMounted(() => {
   <main>
     <Banner />
 
-    <div class="p-container">
-      <NewProduct :products="newProducts" />
-      <div class="border-b w-full" />
-      <TopSelling :products="soldProducts" />
-      <DressStyle />
-      <HappyCustomer />
-    </div>
+    <NewProduct :products="newProducts" />
+    <div class="border-b w-full" />
+    <TopSelling :products="soldProducts" />
+    <DressStyle />
+    <HappyCustomer />
   </main>
 </template>

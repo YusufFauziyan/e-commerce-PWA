@@ -22,7 +22,7 @@ import { BuildingStorefrontIcon } from '@heroicons/vue/24/solid'
       </div>
     </div>
 
-    <div class="p-container flex items-center">
+    <div class="py-[1.5rem] flex items-center container">
       <div class="w-[150px]">
         <p class="font-bold">LOGO</p>
       </div>

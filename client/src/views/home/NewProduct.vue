@@ -20,7 +20,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col justify-center items-center my-12">
+  <div class="flex flex-col justify-center items-center my-12 container">
     <h1 class="font-extrabold text-center text-4xl text-common-black tracking-tight text-shadow">
       NEW ARRIVALS
     </h1>

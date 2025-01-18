@@ -14,9 +14,9 @@ const avatarArray = [apple, ck, gucci, prada, samsung, vercase, zara, uniqlo, hn
 </script>
 
 <template>
-  <div>
+  <div class="bg-primary">
     <!-- Added a single parent div -->
-    <div class="flex justify-between gap-20 bg-primary p-container-x">
+    <div class="flex justify-between gap-20 container">
       <div class="flex-1 flex flex-col justify-center gap-6">
         <h1 class="text-black text-4xl font-bold text-shadow">
           FIND CLOTHES THAT MATCHES YOUR STYLE

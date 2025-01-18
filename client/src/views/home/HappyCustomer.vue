@@ -45,7 +45,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex items-end justify-between gap-4 mt-12">
+  <div class="flex items-end justify-between gap-4 mt-12 container">
     <h1 class="font-extrabold text-center text-4xl text-common-black tracking-tight text-shadow">
       OUR HAPPY CUSTOMERS
     </h1>
