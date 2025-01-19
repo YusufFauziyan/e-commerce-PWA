@@ -1,24 +1,33 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-
+import { computed } from 'vue'
+import { RouterLink, RouterView, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
+
+const route = useRoute()
+
+const showHeaderFooter = computed(() => {
+  return route.path !== '/login'
+})
 </script>
 
 <template>
-  <nav>
-    <Navbar msg="You did it!" />
-  </nav>
-
-  <!-- <RouterLink to="/">Home</RouterLink>
-  <RouterLink to="/about">About</RouterLink> -->
+  <div v-if="showHeaderFooter">
+    <nav>
+      <Navbar />
+    </nav>
+  </div>
 
   <RouterView />
 
-  <!-- footer -->
-  <footer>
-    <Footer />
-  </footer>
+  <div v-if="showHeaderFooter">
+    <footer>
+      <Footer />
+    </footer>
+  </div>
 </template>
 
 <style scoped></style>
+
+<!-- <RouterLink to="/">Home</RouterLink>
+  <RouterLink to="/about">About</RouterLink> -->

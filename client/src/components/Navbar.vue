@@ -1,10 +1,12 @@
 <script setup lang="ts">
-defineProps<{
-  msg: string
-}>()
-
 import { XMarkIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import { BuildingStorefrontIcon } from '@heroicons/vue/24/solid'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const handleLoginClick = () => {
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -44,6 +46,7 @@ import { BuildingStorefrontIcon } from '@heroicons/vue/24/solid'
         </div>
         <button
           class="bg-common-black border text-common-white hover:text-common-black hover:bg-common-white duration-500 px-4 py-2 rounded-full flex items-center text-xs font-medium whitespace-nowrap"
+          @click="handleLoginClick"
         >
           Login
         </button>

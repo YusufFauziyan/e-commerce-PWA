@@ -17,14 +17,14 @@
     --color-background: #ffffff;
     --color-background-primary: #F0F0F0;
     --color-background-common-black: #000000;
-    ---color-background-common-white: #ffffff !important;
+    ---color-background-common-white: #ffffff;
 
 
     --color-text-common-black: #000000;
-    --color-text-common-white: #ffffff !important;
+    --color-text-common-white: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --color-text: rgba(235, 235, 235, 0.64);
     --color-heading: #ffffff;
@@ -39,7 +39,7 @@
     --color-text-common-black: #ffffff;
     --color-text-common-white: #000000;
   }
-}
+} */
 
 /* Global styles untuk body */
 @layer base {
