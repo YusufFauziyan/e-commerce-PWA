@@ -137,3 +137,27 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+// get user by token
+export const getUserByToken = async (req: Request, res: Response) => {
+  const loggedInUser = (req as any).user;
+
+  if (!loggedInUser) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const user = await getUserByIdModel(loggedInUser.id);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const { password, refresh_token, ...userWithoutPassword } = user;
+    res.status(200).json(userWithoutPassword);
+  } catch (error) {
+    console.error("Error retrieving user:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

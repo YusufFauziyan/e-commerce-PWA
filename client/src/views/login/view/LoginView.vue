@@ -1,21 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import { login, loginWithGoogle } from '@/services/authService'
-import { googleSdkLoaded } from 'vue3-google-login'
-
 import type { CallbackTypes } from 'vue3-google-login'
+import { useRouter } from 'vue-router'
 
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_CLIENT_ID
+// store
+import { useAuthStore } from '@/stores/auth'
 
-interface FormValues {
-  email: string
-  password: string
-}
-
+// validation schema
 const schema = yup.object({
   email: yup.string().email('Email must be valid').required('Email is required'),
   password: yup
@@ -23,6 +19,12 @@ const schema = yup.object({
     .min(6, 'Password must be at least 6 characters')
     .required('Password is required'),
 })
+
+// store
+const authStore = useAuthStore()
+
+// router
+const router = useRouter()
 
 const { handleSubmit } = useForm({
   validationSchema: schema,
@@ -38,7 +40,8 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     const res = await login(values.email, values.password)
 
-    console.log('Login success:', res)
+    authStore.setUser(res)
+    router.push('/')
   } catch (error) {
     console.error('Login failed:', error)
   }
@@ -51,7 +54,8 @@ const callbackGoogle: CallbackTypes.CredentialCallback = async (response: any) =
   try {
     const res = await loginWithGoogle(credential)
 
-    console.log('Login with Google success:', res)
+    authStore.setUser(res)
+    router.push('/')
   } catch (error) {
     console.error('Login with Google failed:', error)
   }
@@ -61,6 +65,15 @@ const showPassword = ref(false)
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
+
+console.log(authStore.token)
+console.log(authStore.user)
+
+onMounted(() => {
+  if (authStore.user) {
+    router.push('/')
+  }
+})
 </script>
 
 <template>

@@ -3,8 +3,13 @@ import { computed } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
+
+// initialize session
+authStore.initializeSession()
 
 const showHeaderFooter = computed(() => {
   return route.path !== '/login'
