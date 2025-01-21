@@ -8,9 +8,7 @@ import { formatRupiah } from '../utils/format-number'
     <div class="flex items-center justify-center flex-col">
       <div class="absolute -top-20 container">
         <div class="bg-common-black py-8 px-12 rounded-xl grid grid-cols-2 gap-4 items-center">
-          <h1 class="font-extrabold text-2xl text-white dark:text-black">
-            STAY UPTO DATE ABOUT OUR LATEST OFFERS
-          </h1>
+          <h1 class="font-extrabold text-2xl text-white">STAY UPTO DATE ABOUT OUR LATEST OFFERS</h1>
 
           <div class="flex items-center gap-3 flex-col justify-center px-24 overflow-hidden">
             <div class="relative w-full">
@@ -20,11 +18,11 @@ import { formatRupiah } from '../utils/format-number'
               <input
                 type="email"
                 placeholder="Enter your email address"
-                class="w-full pl-10 border py-1.5 px-4 rounded-2xl text-common-black focus:outline-none text-xs dark:text-black"
+                class="w-full pl-10 border py-1.5 px-4 rounded-2xl text-common-black focus:outline-none text-xs"
               />
             </div>
             <button
-              class="bg-white dark:bg-black dark:text-white py-2 px-4 w-full rounded-2xl text-xs font-bold hover:bg-black duration-200 hover:text-white border-white border dark:hover:bg-white dark:hover:text-black dark:border-black focus:outline-none"
+              class="bg-white py-2 px-4 w-full rounded-2xl text-xs font-bold hover:bg-black duration-200 hover:text-white border-white border focus:outline-none"
             >
               Subscribe to Newsletter
             </button>
@@ -33,7 +31,7 @@ import { formatRupiah } from '../utils/format-number'
       </div>
     </div>
 
-    <div class="bg-primary h-[32vh] dark:text-black footer pt-1">
+    <div class="bg-primary h-[32vh] footer pt-1">
       <div class="container">
         <div class="grid grid-cols-6 gap-4 mt-20 border-b pb-8">
           <div class="col-span-2 flex flex-col gap-4 justify-between">

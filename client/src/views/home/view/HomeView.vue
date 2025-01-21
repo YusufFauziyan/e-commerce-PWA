@@ -6,6 +6,7 @@ import NewProduct from '../NewProduct.vue'
 import TopSelling from '../TopSelling.vue'
 import DressStyle from '../DressStyle.vue'
 import HappyCustomer from '../HappyCustomer.vue'
+import NewAddress from '../NewAddress.vue'
 import { getAllProducts } from '@/services/productService'
 import { handleApiError } from '@/utils/api/apiErrorHandler'
 
@@ -52,5 +53,7 @@ onMounted(() => {
     <TopSelling :products="soldProducts" />
     <DressStyle />
     <HappyCustomer />
+
+    <NewAddress />
   </main>
 </template>
