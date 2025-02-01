@@ -38,14 +38,14 @@ export const getUserByIdModel = async (id: string): Promise<User | null> => {
 
 // post user
 export const postUser = async (user: User): Promise<string> => {
-  const { username, email, password, verified_email } = user;
+  const { username, email, password, verified_email, surename } = user;
 
   // hash password
   const hashedPassword = await hashPassword(password);
 
   const userId = uuidv4();
   const query =
-    "INSERT INTO User (user_id, username, email, password, verified_email) VALUES (?, ?, ?, ?, ?)";
+    "INSERT INTO User (user_id, username, email, password, verified_email, surename) VALUES (?, ?, ?, ?, ?)";
 
   await db.query<ResultSetHeader>(query, [
     userId,
@@ -53,6 +53,7 @@ export const postUser = async (user: User): Promise<string> => {
     email,
     hashedPassword,
     verified_email,
+    surename,
   ]);
 
   return userId;
@@ -63,14 +64,18 @@ export const updateUserById = async (
   id: string,
   user: User
 ): Promise<User | null> => {
-  const { username, email, password } = user;
+  const exitingUser = await getUserByIdModel(id);
+
+  const { username, email, password, phone_number, surename } = user;
   const query =
-    "UPDATE User SET username = ?, email = ?, password = ? WHERE user_id = ?";
+    "UPDATE User SET username = ?, email = ?, password = ?, phone_number = ?, surename = ? WHERE user_id = ?";
 
   const [result] = await db.query<ResultSetHeader>(query, [
-    username,
-    email,
-    password,
+    username || exitingUser?.username,
+    email || exitingUser?.email,
+    password || exitingUser?.password,
+    phone_number || exitingUser?.phone_number,
+    surename || exitingUser?.surename,
     id,
   ]);
 
@@ -92,6 +97,16 @@ export const deleteUserById = async (id: string): Promise<boolean> => {
 export const checkUserExists = async (email: string): Promise<boolean> => {
   const query = "SELECT * FROM User WHERE email = ?";
   const [rows] = await db.query<User[]>(query, [email]);
+  return rows.length > 0;
+};
+
+// check phone exits
+export const checkPhoneExists = async (
+  phone: string,
+  user_id: string
+): Promise<boolean> => {
+  const query = "SELECT * FROM User WHERE phone_number = ? AND user_id <> ?";
+  const [rows] = await db.query<User[]>(query, [phone, user_id]);
   return rows.length > 0;
 };
 

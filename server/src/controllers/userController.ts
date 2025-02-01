@@ -7,6 +7,7 @@ import {
   updateUserById,
   deleteUserById,
   checkUserExists,
+  checkPhoneExists,
 } from "../models/userModel"; // Pastikan model Anda benar
 
 // Fetch all users or the logged-in user's data based on their role
@@ -86,12 +87,30 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   const id = req.params.id; // Mengambil id dari parameter URL
   const user = req.body; // Mengambil data pengguna dari body request
+  const loggedInUser = (req as any).user;
+
+  if (!loggedInUser) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (loggedInUser.id !== id) {
+    res.status(403).json({ message: "Forbidden" });
+    return;
+  }
 
   try {
     // check email exists
     const emailExists = await checkUserExists(user.email); // Fungsi untuk memeriksa apakah email pengguna sudah ada di database
     if (emailExists) {
       res.status(400).json({ message: "Email already exists" });
+      return;
+    }
+
+    // check phone exists
+    const phoneExists = await checkPhoneExists(user.phone_number, id);
+    if (phoneExists) {
+      res.status(400).json({ message: "Phone Number already exists" });
       return;
     }
 

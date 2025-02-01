@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 
 import Banner from '../banner.vue'
 import NewProduct from '../NewProduct.vue'
@@ -9,11 +9,17 @@ import HappyCustomer from '../HappyCustomer.vue'
 import NewAddress from '../NewAddress.vue'
 import { getAllProducts } from '@/services/productService'
 import { handleApiError } from '@/utils/api/apiErrorHandler'
+import { useAuthStore } from '@/stores/auth'
 
+// store
+const authStore = useAuthStore()
+
+// ref
 const newProducts = ref([])
 const soldProducts = ref([])
 const loading = ref(true)
 
+// fetch products
 const fetchNewestProducts = async () => {
   loading.value = true
   try {
@@ -42,6 +48,8 @@ onMounted(() => {
   fetchNewestProducts()
   fetchSoldestProducts()
 })
+
+watchEffect(() => {})
 </script>
 
 <template>
@@ -54,6 +62,9 @@ onMounted(() => {
     <DressStyle />
     <HappyCustomer />
 
-    <NewAddress />
+    <NewAddress
+      v-if="authStore.user && !authStore.user?.verified_phone_number"
+      :user="authStore.user"
+    />
   </main>
 </template>

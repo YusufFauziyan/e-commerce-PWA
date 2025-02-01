@@ -18,6 +18,10 @@ const props = defineProps({
     type: String,
     default: 'primary', // Variasi tombol seperti 'primary', 'secondary', dll.
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
   size: {
     type: String,
     default: 'normal', // Ukuran tombol: sm, normal, large
@@ -49,10 +53,10 @@ const buttonClass = computed(() => {
 <template>
   <button
     :type="type"
-    :disabled="disabled"
+    :disabled="disabled || loading"
     :class="[buttonClass, disabled ? 'opacity-50 cursor-not-allowed' : '']"
   >
-    {{ label }}
+    {{ loading ? 'Loading' : label }}
   </button>
 </template>
 

@@ -86,12 +86,13 @@ export const updateAddressModel = async (
 
   // Update the address
   const query =
-    "UPDATE Address SET street_address = ?, city = ?, postal_code = ? WHERE address_id = ?";
+    "UPDATE Address SET street_address = ?, city = ?, postal_code = ?, title_address = ? WHERE address_id = ?";
 
   await db.query<ResultSetHeader>(query, [
     address.street_address ?? existingAddress.street_address,
     address.city ?? existingAddress.city,
     address.postal_code ?? existingAddress.postal_code,
+    address.title_address ?? existingAddress.title_address,
     id,
   ]);
 
