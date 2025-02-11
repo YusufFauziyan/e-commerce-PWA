@@ -6,6 +6,7 @@ import {
   getCartModel,
   getAllCartModel,
   updateCartModel,
+  getTotalCartModel,
 } from "../models/cartModel";
 import { getProductModel } from "../models/productModel";
 
@@ -21,10 +22,34 @@ export const getAllCart = async (
     return;
   }
 
-  try {
-    const cart = await getAllCartModel(loggedInUser.id, loggedInUser.role);
+  const {
+    page = 1,
+    limit = 10,
+    sort = "desc",
+    orderBy = "created_at",
+  } = req.query;
 
-    res.status(200).json(cart);
+  const currentPage = Number(page);
+  const perPage = Number(limit);
+  const offset = (currentPage - 1) * perPage;
+
+  try {
+    const { items, total } = await getAllCartModel(
+      loggedInUser.id,
+      loggedInUser.role,
+      orderBy as string,
+      sort as string,
+      offset,
+      perPage
+    );
+
+    res.status(200).json({
+      page: currentPage,
+      perPage,
+      total,
+      totalPages: Math.ceil(total / perPage),
+      items,
+    });
   } catch (error) {
     console.error("Error retrieving cart:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -117,6 +142,25 @@ export const deleteCart = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error("Error deleting cart:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// get total cart
+export const getTotalCart = async (req: Request, res: Response) => {
+  const loggedInUser = (req as any).user;
+
+  if (!loggedInUser) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const total = await getTotalCartModel(loggedInUser.id);
+
+    res.status(200).json({ total });
+  } catch (error) {
+    console.error("Error retrieving cart:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

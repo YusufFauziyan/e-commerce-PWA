@@ -27,7 +27,7 @@ export const getAllProductModel = async (
   const [totalRows] = await db.query("SELECT COUNT(*) AS total FROM Product");
   const total = (totalRows as RowDataPacket[])[0].total;
 
-  // Validasi input untuk orderBy dan sortOrder
+  // Validate orderBy and sortOrder
   const validOrderBy = [
     "created_at",
     "price",
@@ -35,7 +35,7 @@ export const getAllProductModel = async (
     "sold_quantity",
   ].includes(orderBy)
     ? orderBy
-    : "created_at"; // Default ke created_at jika tidak valid
+    : "created_at"; // Default to created_at
   const validSortOrder = sortOrder.toLowerCase() === "desc" ? "DESC" : "ASC";
 
   // Susun query

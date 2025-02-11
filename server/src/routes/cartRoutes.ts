@@ -6,12 +6,14 @@ import {
   getCart,
   getAllCart,
   updateCart,
+  getTotalCart,
 } from "../controllers/cartController";
 
 const router = Router();
 
 // Collection Users
 router.get("/cart", authenticateToken, getAllCart);
+router.get("/cart/total", authenticateToken, getTotalCart);
 router.get("/cart/:id", authenticateToken, getCart);
 router.post("/cart", authenticateToken, createCart);
 router.put("/cart/:id", authenticateToken, updateCart);

@@ -14,16 +14,57 @@ interface Cart extends RowDataPacket {
 // get all cart
 export const getAllCartModel = async (
   userId: string,
-  role: string
-): Promise<Cart[]> => {
+  role: string,
+  orderBy: string,
+  sortOrder: string,
+  offset: number,
+  limit: number
+): Promise<{
+  items: Cart[];
+  total: number;
+}> => {
+  const isAdmin = role === "admin";
   let query = "";
-  if (role === "admin") {
-    query = "SELECT * FROM Cart";
+  let queryTotal = "";
+
+  // Validate orderBy and sortOrder
+  const validOrderBy = ["created_at"].includes(orderBy)
+    ? orderBy
+    : "created_at"; // Default to created_at
+  const validSortOrder = sortOrder.toLowerCase() === "desc" ? "DESC" : "ASC";
+
+  if (isAdmin) {
+    query = `
+      SELECT 
+        * 
+      FROM 
+        Cart 
+      ORDER BY 
+        ${validOrderBy} ${validSortOrder}
+      LIMIT ? OFFSET ?;
+    `;
+    queryTotal = "SELECT COUNT(*) AS total FROM Cart";
   } else {
-    query = "SELECT * FROM Cart WHERE user_id = ?";
+    query = `
+      SELECT 
+        * 
+      FROM 
+        Cart 
+      WHERE 
+        user_id = ?
+      ORDER BY
+        ${validOrderBy} ${validSortOrder}
+      LIMIT ? OFFSET ?
+      `;
+    queryTotal = `SELECT COUNT(*) AS total FROM Cart WHERE user_id = ?`;
   }
 
-  const [rows] = await db.query<Cart[]>(query, [userId]);
+  const [rows] = await db.query<Cart[]>(
+    query,
+    isAdmin ? [limit, offset] : [userId, limit, offset]
+  );
+  const [totalRows] = await db.query(queryTotal, [userId]);
+  const total = (totalRows as RowDataPacket[])[0].total;
 
   const carts = await Promise.all(
     rows.map(async ({ cart_id, ...cart }) => {
@@ -35,7 +76,7 @@ export const getAllCartModel = async (
     })
   );
 
-  return carts as Cart[];
+  return { items: carts, total };
 };
 
 // get cart by id
@@ -134,4 +175,13 @@ export const deleteCartModel = async (id: string): Promise<boolean> => {
   const query = "DELETE FROM Cart WHERE cart_id = ?";
   const [result] = await db.query<ResultSetHeader>(query, [id]);
   return result.affectedRows > 0;
+};
+
+// total cart
+export const getTotalCartModel = async (userId: string): Promise<number> => {
+  const query = "SELECT COUNT(*) AS total FROM Cart WHERE user_id = ?";
+  const [rows] = await db.query(query, [userId]);
+  const total = (rows as RowDataPacket[])[0].total;
+
+  return total;
 };
