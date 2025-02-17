@@ -66,9 +66,9 @@ export const updateUserById = async (
 ): Promise<User | null> => {
   const exitingUser = await getUserByIdModel(id);
 
-  const { username, email, password, phone_number, surename } = user;
+  const { username, email, password, phone_number, surename, avatar } = user;
   const query =
-    "UPDATE User SET username = ?, email = ?, password = ?, phone_number = ?, surename = ? WHERE user_id = ?";
+    "UPDATE User SET username = ?, email = ?, password = ?, phone_number = ?, surename = ?, avatar = ? WHERE user_id = ?";
 
   const [result] = await db.query<ResultSetHeader>(query, [
     username || exitingUser?.username,
@@ -76,6 +76,7 @@ export const updateUserById = async (
     password || exitingUser?.password,
     phone_number || exitingUser?.phone_number,
     surename || exitingUser?.surename,
+    avatar || JSON.stringify(exitingUser?.avatar),
     id,
   ]);
 

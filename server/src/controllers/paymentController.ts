@@ -90,7 +90,7 @@ export const createPayment = async (req: Request, res: Response) => {
 
     const item_details = order.orders.map((orderItem: any) => ({
       id: orderItem.id,
-      price: Number(orderItem.product.price),
+      price: Number(orderItem.product.final_price),
       quantity: orderItem.quantity,
       name: orderItem.product.name,
       category: orderItem.product.categories.join(","),

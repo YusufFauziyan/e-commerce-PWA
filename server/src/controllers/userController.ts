@@ -9,6 +9,7 @@ import {
   checkUserExists,
   checkPhoneExists,
 } from "../models/userModel"; // Pastikan model Anda benar
+import { deleteImage, uploadImage } from "./uploadController";
 
 // Fetch all users or the logged-in user's data based on their role
 export const getAllUsers = async (
@@ -119,6 +120,23 @@ export const updateUser = async (req: Request, res: Response) => {
     if (!userExists) {
       res.status(404).json({ message: "User not found" });
       return;
+    }
+
+    // Upload avatar
+    let avatar = req.file as Express.Multer.File;
+
+    if (avatar) {
+      // delete old avatar
+      if (userExists.avatar) {
+        const oldAvatar = userExists.avatar;
+        await deleteImage(oldAvatar.public_id);
+      }
+
+      // upload new avatar
+      const uploadResult = await uploadImage(avatar, loggedInUser.email);
+      if (uploadResult) {
+        user.avatar = JSON.stringify(uploadResult);
+      }
     }
 
     const updatedUser = await updateUserById(id, user); // Fungsi untuk mengupdate data pengguna berdasarkan id

@@ -38,7 +38,7 @@ export const uploadMultipleImages = async (
     const uploadResults = await Promise.all(
       files.map((file: Express.Multer.File) =>
         cloudinary.uploader.upload(file.path, {
-          folder: `e-commerece-pwa/${userEmail}`, // Folder Cloudinary
+          folder: `e-commerece-pwa/${userEmail}/products`, // Folder Cloudinary
         })
       )
     );

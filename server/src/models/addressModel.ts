@@ -49,11 +49,18 @@ export const getAddressModel = async (id: string): Promise<Address | null> => {
 export const createAddressModel = async (
   address: Address
 ): Promise<Address> => {
-  const { user_id, street_address, city, postal_code } = address;
+  const {
+    user_id,
+    street_address,
+    city,
+    postal_code,
+    default_address,
+    title_address,
+  } = address;
 
   const addressId = uuidv4();
   const query =
-    "INSERT INTO Address (address_id, user_id, street_address, city, postal_code) VALUES (?, ?, ?, ?, ?)";
+    "INSERT INTO Address (address_id, user_id, street_address, city, postal_code, default_address, title_address) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
   await db.query<ResultSetHeader>(query, [
     addressId,
@@ -61,6 +68,8 @@ export const createAddressModel = async (
     street_address,
     city,
     postal_code,
+    default_address,
+    title_address,
   ]);
 
   // Fetch the newly created address from the database
@@ -86,13 +95,14 @@ export const updateAddressModel = async (
 
   // Update the address
   const query =
-    "UPDATE Address SET street_address = ?, city = ?, postal_code = ?, title_address = ? WHERE address_id = ?";
+    "UPDATE Address SET street_address = ?, city = ?, postal_code = ?, title_address = ?, default_address = ? WHERE address_id = ?";
 
   await db.query<ResultSetHeader>(query, [
     address.street_address ?? existingAddress.street_address,
     address.city ?? existingAddress.city,
     address.postal_code ?? existingAddress.postal_code,
     address.title_address ?? existingAddress.title_address,
+    address.default_address ?? existingAddress.default_address,
     id,
   ]);
 
